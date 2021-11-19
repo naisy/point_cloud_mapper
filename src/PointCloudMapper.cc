@@ -127,7 +127,10 @@ bool PointCloudMapper::InsertPoints(const PointCloud::ConstPtr& points,
     // if there is not already a point in the same voxel.
     for (size_t ii = 0; ii < points->points.size(); ++ii) {
       const pcl::PointXYZ p = points->points[ii];
-      if (!map_octree_->isVoxelOccupiedAtPoint(p)) {
+      double min_x, min_y, min_z, max_x, max_y, max_z;
+      map_octree_->getBoundingBox(min_x, min_y, min_z, max_x, max_y, max_z);
+      bool isInBox = (p.x >= min_x && p.x <= max_x) && (p.y >= min_y && p.y <= max_y) && (p.z >= min_z && p.z <= max_z);
+      if (!isInBox || !map_octree_->isVoxelOccupiedAtPoint(p)) {
         map_octree_->addPointToCloud(p, map_data_);
         incremental_points->push_back(p);
       }
